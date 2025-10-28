@@ -2,7 +2,7 @@ name: Run Python script every minute
 
 on:
   schedule:
-    - cron: "*/1 * * * *"   # Run every 1 minute
+    - cron: "*/10 * * * *"   # Run every 10 minute
   workflow_dispatch: {}     # Allow manual trigger
 
 jobs:
