@@ -1,0 +1,41 @@
+name: Run Python script every minute
+
+# schedule: runs every minute. Also allow manual trigger.
+on:
+  schedule:
+    - cron: "*/1 * * * *"
+  workflow_dispatch: {}
+
+jobs:
+  run-python:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'   # change if needed
+
+      - name: Install dependencies
+        # if you don't have requirements.txt, remove this step
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run Python script
+        run: |
+          python updated_squish_licbot.py
+
+      # Optional: commit changes back to repo (enable workflow write permission)
+      - name: Commit and push changes (optional)
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git add -A
+          git commit -m "Auto update by GitHub Actions" || echo "No changes to commit"
+          git push origin HEAD:${{ github.ref_name }}
